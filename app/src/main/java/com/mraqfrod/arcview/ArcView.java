@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -163,6 +164,12 @@ public class ArcView extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         // 16度 到28度
             for(int i =16 ; i<29;i+=2){
+                float r = mInnerRadius+mGapWidth + 40*mMinSize;
+                float x =(float)(mCenter + r*Math.cos((26-i)/ 2*Math.PI/4));
+                float y =(float)(mCenter - r*Math.sin((26 - i) / 2 * Math.PI / 4));
+                // ascent：是baseline之上至字符最高处的距离
+                // descent：是baseline之下至字符最低处的距离
+                canvas.drawText(""+i,x,y-((mTextPaint.descent() + mTextPaint.ascent())/2),mTextPaint);
 
             }
 
@@ -183,5 +190,30 @@ public class ArcView extends View {
         checkTemperature(t);
         mTemperature = t ;
         invalidate();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event .getY();
+        //点击的点 到中心的距离
+        double distance = Math.sqrt((x -mCenter)* (x-mCenter)+(y-mCenter)*(y-mCenter));
+            //不在圆弧里 不处理
+        if(distance < mInnerRadius || distance >mInnerRadius + mGapWidth){
+            return false;
+        }
+        // atan2是从 X 轴正向逆时针旋转到点 (x,y) 时经过的角度。
+        double degree = Math.atan2(-(y-mCenter),x-mCenter);
+        //在圆弧下方 没颜区域  不处理
+        if(-3*Math.PI/4<degree && degree <-Math.PI/4){
+            return false;
+        }
+        if(degree <-3*Math.PI/4){
+            degree = degree + 2*Math.PI;
+        }
+        float t = (float) (26 - degree *8 /Math.PI);
+        setTemperature(t);
+        return true;
+
     }
 }
