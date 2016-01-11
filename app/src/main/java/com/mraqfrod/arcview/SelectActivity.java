@@ -22,6 +22,13 @@ public class SelectActivity extends AppCompatActivity {
             }
         });
 
+     button_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SelectActivity.this,Main2Activity.class));
+            }
+        });
+
 
 
     }
